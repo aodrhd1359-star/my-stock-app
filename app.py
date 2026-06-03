@@ -48,7 +48,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ Pro Trader (V13 - 모바일 UI/UX 최적화)")
+st.title("⚡ Pro Trader (V13.1 - 줌/확대 기능 해제)")
 
 if 'memos' not in st.session_state: st.session_state['memos'] = []
 
@@ -139,10 +139,9 @@ if not df.empty:
         elif df['RSI'].iloc[-1]>65: sc-=1; rsn.append("🔴 단기 과열 (조정 주의)")
         else: rsn.append("⚪ 수급 안정적")
 
-    # 세련된 핀테크 컬러 코드 적용 (Toss, 토스증권 등에서 쓰는 트렌디한 색상)
-    UP_COLOR = '#F04452'   # 산뜻한 레드
-    DOWN_COLOR = '#3182F6' # 청량한 블루
-    NEUTRAL_COLOR = '#8B95A1' # 부드러운 그레이
+    UP_COLOR = '#F04452'
+    DOWN_COLOR = '#3182F6'
+    NEUTRAL_COLOR = '#8B95A1'
 
     c_bg, c_txt, msg = ("rgba(240,68,82,0.1)", UP_COLOR, "🔥 적극 매수") if sc>=3 else ("rgba(240,68,82,0.05)", UP_COLOR, "매수 우위") if sc>0 else ("rgba(139,149,161,0.1)", NEUTRAL_COLOR, "관망 (중립)") if sc==0 else ("rgba(49,130,246,0.05)", DOWN_COLOR, "매도 우위") if sc>-3 else ("rgba(49,130,246,0.1)", DOWN_COLOR, "❄️ 적극 매도")
     
@@ -152,7 +151,6 @@ if not df.empty:
 
     st.markdown("---")
     
-    # 모바일에 맞춘 상단 UI 배치
     c1, c2 = st.columns([1, 1.2])
     with c1: 
         st.markdown(f'<div class="ai-box" style="border-color: {c_bg};"><div style="color:#8B95A1; font-size:0.9rem; font-weight:bold; margin-bottom:8px;">🤖 AI 실시간 판정</div><div style="color:{c_txt}; font-size:1.8rem; font-weight:800; margin-bottom:12px;">{msg}</div><div style="color:#B0B8C1; font-size:0.95rem; line-height:1.6;">{"<br>".join(rsn)}</div></div>', unsafe_allow_html=True)
@@ -172,7 +170,6 @@ if not df.empty:
     
     fig = make_subplots(rows=rows, cols=1, shared_xaxes=True, vertical_spacing=0.02, row_heights=row_h)
     
-    # 캔들차트 색상 변경
     fig.add_trace(go.Candlestick(x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=c, name="Price", 
                                  increasing_line_color=UP_COLOR, increasing_fillcolor=UP_COLOR, 
                                  decreasing_line_color=DOWN_COLOR, decreasing_fillcolor=DOWN_COLOR), row=1, col=1)
@@ -208,15 +205,15 @@ if not df.empty:
     elif y_int in ['1d','1wk']: fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
     elif y_int in ['1m','5m','15m','1h']: fig.update_xaxes(rangebreaks=[dict(bounds=[16, 9.5], pattern="hour"), dict(bounds=["sat", "mon"])])
 
-    # 차트 모바일 최적화 레이아웃 설정
+    # 🚨 [수정됨] 드래그 모드를 'zoom'으로 변경하고 상단 여백을 늘려 메뉴바 공간 확보
     fig.update_layout(
-        height=650, # 모바일 한 화면에 들어오도록 약간 축소
+        height=650, 
         template="plotly_dark", 
-        dragmode='pan', # 기본 조작을 패닝(좌우 이동)으로 고정
+        dragmode='zoom', # 돋보기(가로 확대) 모드 활성화!
         hovermode='x unified', 
         showlegend=False, 
         xaxis_rangeslider_visible=False, 
-        margin=dict(l=5, r=40, t=10, b=10), # 모바일 여백 최소화
+        margin=dict(l=5, r=40, t=30, b=10), # 상단 여백(t) 확보
         plot_bgcolor='#0F1218', 
         paper_bgcolor='#0F1218'
     )
@@ -224,11 +221,13 @@ if not df.empty:
     fig.update_yaxes(side="right", showgrid=True, gridcolor='#1E2532', zeroline=False, fixedrange=False)
     fig.update_xaxes(showgrid=True, gridcolor='#1E2532', zeroline=False)
     
-    # 모바일 터치 민감도 및 거슬리는 메뉴바 숨김 처리
+    # 🚨 [수정됨] 차트 우측 상단에 확대/이동/초기화 메뉴바 다시 표시
     st.plotly_chart(fig, use_container_width=True, config={
-        'scrollZoom': True, 
-        'displayModeBar': False, # 상단 자잘한 아이콘 메뉴 완전히 숨김
-        'doubleClick': 'reset'
+        'scrollZoom': True, # 마우스 휠 및 두 손가락 핀치 줌 허용
+        'displayModeBar': True, # 상단 메뉴바 부활
+        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d'], # 안 쓰는 잡다한 버튼만 숨김
+        'displaylogo': False,
+        'doubleClick': 'reset' # 화면 두 번 터치하면 원래 크기로 복귀
     })
 else: st.error("데이터 오류. 장이 닫혀있거나 종목명을 다시 확인해 주세요.")
 
