@@ -15,40 +15,42 @@ except ImportError:
     HAS_PYKRX = False
 
 # 1. 화면 설정
-st.set_page_config(page_title="Pro Trader MTS V20", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Pro Trader MTS V21", layout="wide", initial_sidebar_state="collapsed")
 
-# 2. MTS 전용 CSS
+# 2. MTS 전용 CSS (OLED 트루 블랙 테마로 고급화)
 st.markdown("""
     <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     * { font-family: 'Pretendard', sans-serif !important; }
     
-    .stApp { background-color: #0F1218; color: #F1F5F9; }
-    .block-container { padding: 0.8rem 0.5rem 0rem 0.5rem !important; max-width: 100% !important; }
+    /* OLED 트루 블랙 배경 및 기본 글자색 */
+    .stApp { background-color: #000000; color: #F1F5F9; }
+    .block-container { padding: 0.5rem 0.2rem 0rem 0.2rem !important; max-width: 100% !important; }
     header { visibility: hidden !important; height: 0px !important; }
     
-    .mts-header { padding: 2px 5px; margin-bottom: 5px; }
-    .mts-ticker { font-size: 1.1rem; color: #8B95A1; font-weight: 600; }
+    .mts-header { padding: 5px 10px; margin-bottom: 5px; }
+    .mts-ticker { font-size: 1.15rem; color: #8B95A1; font-weight: 600; }
     .mts-price-row { display: flex; align-items: baseline; margin-top: 2px; }
-    .mts-main-price { font-size: 2.3rem; font-weight: 800; letter-spacing: -1px; }
+    .mts-main-price { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; }
     
-    .pattern-box { background: linear-gradient(135deg, #191E28, #121621); padding: 14px; border-radius: 14px; border: 1px solid #2A3241; margin-bottom: 12px; }
+    /* 박스 테마도 더 어둡고 세련되게 변경 */
+    .pattern-box { background: linear-gradient(135deg, #0A0A0A, #121212); padding: 14px; border-radius: 14px; border: 1px solid #222; margin-bottom: 12px; margin: 0 5px; }
     .pattern-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
     
-    .macro-box { background-color: #191E28; border-radius: 12px; padding: 10px; border: 1px solid #2A3241; text-align: center; margin-bottom:10px; }
+    .macro-box { background-color: #0A0A0A; border-radius: 12px; padding: 10px; border: 1px solid #222; text-align: center; margin-bottom:10px; }
     .macro-title { color: #8B95A1; font-size: 0.85rem; font-weight: 600; }
     .macro-val { color: #FFF; font-size: 1.3rem; font-weight: 800; margin: 3px 0; }
     
-    .fund-box { display: flex; justify-content: space-between; background-color: #191E28; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; }
+    .fund-box { display: flex; justify-content: space-between; background-color: #0A0A0A; padding: 10px 15px; border-radius: 10px; margin: 0 5px 10px 5px; border: 1px solid #222;}
     .fund-item { text-align: center; }
     .fund-label { font-size: 0.8rem; color: #8B95A1; }
     .fund-val { font-size: 1rem; font-weight: 700; color: #E5E8EB; }
     
-    .news-box { background-color: #191E28; padding: 12px; border-radius: 12px; margin-top: 8px; border: 1px solid #2A3241; }
-    .news-item { margin-bottom: 8px; font-size: 0.9rem; line-height: 1.4; border-bottom: 1px solid #2A3241; padding-bottom: 6px; }
+    .news-box { background-color: #0A0A0A; padding: 12px; border-radius: 12px; margin: 10px 5px; border: 1px solid #222; }
+    .news-item { margin-bottom: 8px; font-size: 0.9rem; line-height: 1.4; border-bottom: 1px solid #222; padding-bottom: 6px; }
     .news-item a { color: #E5E8EB; text-decoration: none; }
     
-    button[data-testid="stPopoverButton"] { background-color: #222937 !important; color: #FFFFFF !important; border: 1px solid #333D4B !important; border-radius: 10px !important; width: 100%; }
+    button[data-testid="stPopoverButton"] { background-color: #111 !important; color: #FFFFFF !important; border: 1px solid #333 !important; border-radius: 10px !important; width: 100%; margin: 0 5px;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -98,17 +100,17 @@ def get_financials(ticker):
     except: return None
 
 # --- 상단 팝오버 메뉴 ---
-config_pop = st.popover("🧭 매크로 시황 및 종목 설정")
+config_pop = st.popover("⚙️ 매크로 시황 및 종목 설정")
 
 with config_pop:
-    app_mode = st.radio("화면 모드", ["🌍 글로벌 매크로 보드", "📈 개별 종목 차트"], horizontal=True)
+    app_mode = st.radio("화면 모드", ["🌍 매크로 보드", "📈 개별 종목 차트"], horizontal=True)
     st.markdown("---")
     if app_mode == "📈 개별 종목 차트":
         asset_type = st.radio("자산군", ["주식", "코인 (Crypto)"], horizontal=True)
         if asset_type == "주식":
-            user_input = st.text_input("종목명 입력", "삼성전자")
+            user_input = st.text_input("종목명 입력 (미국주식 티커 입력 가능)", "QQQ")
             raw_code = get_stock_code(user_input)
-            ticker = f"{raw_code}.KS" if raw_code else user_input
+            ticker = f"{raw_code}.KS" if raw_code else user_input.upper()
             y_int = st.selectbox("차트 주기", ["1m", "5m", "15m", "1h", "1d", "1wk"], index=4)
         else:
             coins = {"비트코인(BTC)":"BTC-USD", "이더리움(ETH)":"ETH-USD", "리플(XRP)":"XRP-USD", "솔라나(SOL)":"SOL-USD"}
@@ -118,8 +120,8 @@ with config_pop:
             y_int = st.selectbox("차트 주기", ["1m", "5m", "15m", "1h", "1d", "1wk"], index=2)
             raw_code = None
             
-        st.subheader("지표 선택 (복구 완료)")
-        show_ma = st.checkbox("지수이평선 (EMA 5/20/60)", True)
+        st.subheader("지표 선택")
+        show_ma = st.checkbox("지수이평선 (EMA)", True)
         show_bb = st.checkbox("볼린저 밴드", True)
         show_ichi = st.checkbox("☁️ 일목균형표 (구름대)", False)
         show_sig = st.checkbox("AI 매매시그널 마커", True)
@@ -129,9 +131,8 @@ with config_pop:
 # ==========================================
 # 🌍 화면 1: 글로벌 매크로 종합 시황 보드
 # ==========================================
-if app_mode == "🌍 글로벌 매크로 보드":
-    st.markdown("<h3 style='color:#FFF; font-weight:800; margin-bottom:5px;'>🌍 AI 매크로 & 환율 브리핑</h3>", unsafe_allow_html=True)
-    
+if app_mode == "🌍 매크로 보드":
+    st.markdown("<h3 style='color:#FFF; font-weight:800; margin:10px 5px;'>🌍 AI 매크로 & 환율 브리핑</h3>", unsafe_allow_html=True)
     macro_tickers = {"S&P 500": "^GSPC", "나스닥": "^IXIC", "원/달러 환율": "KRW=X", "미 10년물 국채": "^TNX", "VIX (공포지수)": "^VIX", "비트코인": "BTC-USD"}
     
     with st.spinner("글로벌 매크로 데이터 분석 중..."):
@@ -140,7 +141,6 @@ if app_mode == "🌍 글로벌 매크로 보드":
     if not m_data.empty:
         c1, c2, c3 = st.columns(3)
         cols = [c1, c2, c3, c1, c2, c3]
-        
         macro_vals = {}
         for idx, (name, t) in enumerate(macro_tickers.items()):
             try:
@@ -149,7 +149,6 @@ if app_mode == "🌍 글로벌 매크로 보드":
                     last, prev = close_prices.iloc[-1], close_prices.iloc[-2]
                     chg, pct = last - prev, (last - prev) / prev * 100
                     macro_vals[name] = {"last": last, "chg": chg, "pct": pct}
-                    
                     color = "#F04452" if chg > 0 else "#3182F6" if chg < 0 else "#8B95A1"
                     sign = "+" if chg > 0 else ""
                     with cols[idx]:
@@ -168,30 +167,30 @@ if app_mode == "🌍 글로벌 매크로 보드":
             cause_txt, strategy_txt, alert_color = "", "", "#3182F6"
             
             if krw > 1370 and tnx > 4.3:
-                cause_txt = "현재 **원/달러 환율 상승(원화 약세)**의 주된 원인은 **미국 국채 10년물 금리의 고공행진**입니다. 안전자산인 달러로 자금이 쏠리고 있습니다."
-                strategy_txt = "🚨 **[방어적 현금 확보]** 강달러 국면에서는 외인들의 국내 증시 이탈이 가속화됩니다. 신규 투자를 보류하고 보수적인 분할 매수를 권장합니다."
+                cause_txt = "현재 **원/달러 환율 상승(원화 약세)**의 주된 원인은 **미국 국채 10년물 금리의 고공행진**입니다."
+                strategy_txt = "🚨 **[방어적 현금 확보]** 강달러 국면에서는 외인들의 국내 증시 이탈이 가속화됩니다. 보수적인 분할 매수를 권장합니다."
                 alert_color = "#F04452"
             elif krw < 1320 and tnx < 4.0:
-                cause_txt = "현재 **원/달러 환율 하락(원화 강세)**은 **미국 국채 금리 안정화**에 기인합니다. 외국인 자금이 신흥국 증시로 유입되기 좋은 환경입니다."
-                strategy_txt = "🚀 **[공격적 비중 확대]** 시장에 유동성이 공급되는 훈풍 국면입니다. 우량주를 중심으로 무한매수 사이클을 가동하기 좋습니다."
+                cause_txt = "현재 **원/달러 환율 하락(원화 강세)**은 **미국 국채 금리 안정화**에 기인합니다."
+                strategy_txt = "🚀 **[공격적 비중 확대]** 시장에 유동성이 공급되는 훈풍 국면입니다. 우량주를 중심으로 사이클을 가동하기 좋습니다."
                 alert_color = "#00F5A0"
             elif vix > 25:
-                cause_txt = "환율 여부와 관계없이 현재 **VIX(공포지수)가 위험 수위**를 넘었습니다. 시장에 패닉셀이 나오고 있습니다."
+                cause_txt = "현재 **VIX(공포지수)가 위험 수위**를 넘었습니다. 시장에 패닉셀이 나오고 있습니다."
                 strategy_txt = "⚡ **[리스크 관리 최우선]** 변동성이 극심하므로 단기 스캘핑 외의 스윙/장기 투자는 보류하고 관망하세요."
                 alert_color = "#FFD400"
             else:
                 cause_txt = f"현재 환율은 **{krw:,.1f}원**으로 박스권에서 안정적인 횡보 흐름을 보이고 있습니다."
-                strategy_txt = "⚖️ **[종목 장세 대응]** 매크로의 영향력이 적으므로, 재무가 탄탄하고 차트 패턴이 좋은 개별 종목 발굴에 집중하세요."
+                strategy_txt = "⚖️ **[종목 장세 대응]** 매크로의 영향력이 적으므로, 개별 종목 발굴에 집중하세요."
                 
             st.markdown(f"""
             <div class="pattern-box" style="border-left: 5px solid {alert_color};">
-                <div style="font-size:1.1rem; font-weight:800; color:{alert_color}; margin-bottom:8px;">🧠 AI 매크로 분석 & 투자 전략</div>
-                <div style="color: #E5E8EB; font-size: 0.95rem; line-height:1.5; margin-bottom:8px;">💡 <b>환율 변동 원인:</b> {cause_txt}</div>
+                <div style="font-size:1.1rem; font-weight:800; color:{alert_color}; margin-bottom:8px;">🧠 AI 매크로 분석 & 전략</div>
+                <div style="color: #E5E8EB; font-size: 0.95rem; line-height:1.5; margin-bottom:8px;">💡 <b>환율 원인:</b> {cause_txt}</div>
                 <div style="color: #FFF; font-size: 0.95rem; line-height:1.5;">🎯 <b>대응 전략:</b> {strategy_txt}</div>
             </div>
             """, unsafe_allow_html=True)
             
-    st.markdown("<h4 style='color:#FFF; font-weight:700;'>📰 실시간 시장 동향 (메이저 경제지)</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:#FFF; font-weight:700; margin-left:5px;'>📰 시장 동향 뉴스</h4>", unsafe_allow_html=True)
     macro_news = get_premium_news("미국 증시 OR 환율 전망")
     if macro_news:
         st.markdown('<div class="news-box">', unsafe_allow_html=True)
@@ -212,7 +211,6 @@ else:
         if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
         if df.index.tz is not None: df.index = df.index.tz_localize(None)
 
-        # 기본 핵심 기술 지표 다시 완벽하게 계산
         c = df['Close']
         df['EMA5'] = c.ewm(span=5, adjust=False).mean()
         df['EMA20'] = c.ewm(span=20, adjust=False).mean()
@@ -232,9 +230,9 @@ else:
             df['Senkou_B'] = ((df['High'].rolling(52).max()+df['Low'].rolling(52).min())/2).shift(26)
         else: df['Senkou_A'], df['Senkou_B'] = np.nan, np.nan
 
-        # 📊 빅데이터 차트 패턴 분석 2.0 (상세 텍스트 복구)
+        # 📊 빅데이터 차트 패턴 분석
         tech_sc = (1 if df['EMA5'].iloc[-1] > df['EMA20'].iloc[-1] else -1) + (1 if df['RSI'].iloc[-1] < 35 else -1 if df['RSI'].iloc[-1] > 65 else 0)
-        pattern_txt = "뚜렷한 반등/하락 패턴이 완성되지 않았습니다. 방향성이 정해질 때까지 분할 대응이 유리합니다."
+        pattern_txt = "뚜렷한 반등/하락 패턴이 완성되지 않았습니다. 분할 대응이 유리합니다."
         
         if len(df) > 30:
             recent_lows = df['Low'].iloc[-30:].values
@@ -242,63 +240,70 @@ else:
             current_p = df['Close'].iloc[-1]
             
             if current_p > np.max(recent_highs[:-1]) and df['RSI'].iloc[-1] > 55:
-                pattern_txt = "🚀 [박스권 상단 돌파] 오랜 기간 갇혀있던 저항선을 뚫고 새로운 시세를 분출하고 있습니다."
+                pattern_txt = "🚀 [박스권 돌파] 저항선을 뚫고 새로운 시세를 분출 중입니다."
                 tech_sc += 2
             elif len(recent_lows) >= 21:
                 p1, p2, p3 = np.min(recent_lows[:7]), np.min(recent_lows[7:14]), np.min(recent_lows[14:21])
                 if p2 < p1 and p2 < p3 and current_p > np.max(recent_highs[-10:]):
-                    pattern_txt = "👑 [역헤드앤숄더] 머리(최저점)를 찍고 오른쪽 어깨를 형성하며 강력하게 추세 전환 중입니다."
+                    pattern_txt = "👑 [역헤드앤숄더] 머리(최저점)를 찍고 강력하게 추세 전환 중입니다."
                     tech_sc += 3
             elif len(recent_lows) >= 20:
                 part1, part2 = recent_lows[:10], recent_lows[10:20]
                 if abs(np.min(part1) - np.min(part2)) / np.min(part1) < 0.015 and current_p > np.min(part2):
-                    pattern_txt = "📈 [W형 쌍바닥] 바닥을 두 번 튼튼하게 다졌습니다. 매매 사이클을 새로 진입하기 아주 좋은 타점입니다."
+                    pattern_txt = "📈 [W형 쌍바닥] 바닥을 두 번 다졌습니다. 매수 타점입니다."
                     tech_sc += 2
             elif len(recent_highs) >= 20:
                 part1_h, part2_h = recent_highs[:10], recent_highs[10:20]
                 if abs(np.max(part1_h) - np.max(part2_h)) / np.max(part1_h) < 0.015 and current_p < np.max(part2_h):
-                    pattern_txt = "📉 [M형 쌍고점] 고점을 뚫지 못하고 무너지는 전형적인 천장 패턴입니다. 즉각 비중을 줄이세요."
+                    pattern_txt = "📉 [M형 쌍고점] 천장 패턴입니다. 즉각 비중을 줄이세요."
                     tech_sc -= 3
             elif df['RSI'].iloc[-3] < 30 and df['RSI'].iloc[-1] > 45:
-                pattern_txt = "⚡ [V자 급반등] 과도한 공포로 인한 투매를 세력이 받아먹고 끌어올리는 반등 구간입니다."
+                pattern_txt = "⚡ [V자 반등] 투매 물량을 받아먹고 끌어올리는 반등 구간입니다."
                 tech_sc += 1
 
-        # 기본적 분석 (재무제표)
-        fund_txt, fund_sc = "재무 데이터가 없거나 코인 종목입니다. 차트와 수급(단기 트레이딩) 위주로 대응하세요.", 0
+        fund_txt, fund_sc = "재무 데이터가 없거나 코인 종목입니다. 차트 위주로 대응하세요.", 0
         if fund_data and fund_data["PER"] > 0:
             per, pbr, roe = fund_data["PER"], fund_data["PBR"], fund_data["ROE"]
             if per < 10 and roe > 10:
-                fund_txt = f"PER {per:.1f}배, ROE {roe:.1f}%로 실적 대비 매우 저평가된 우량 상태입니다."
-                fund_sc = 2
+                fund_txt, fund_sc = f"PER {per:.1f}배, ROE {roe:.1f}%로 실적 대비 매우 저평가 상태입니다.", 2
             elif per > 40:
-                fund_txt = f"PER {per:.1f}배로 실적 대비 주가가 다소 고평가(과열)된 상태입니다."
-                fund_sc = -1
+                fund_txt, fund_sc = f"PER {per:.1f}배로 주가가 다소 고평가(과열)된 상태입니다.", -1
             else:
-                fund_txt = f"PER {per:.1f}배로 업종 평균 수준의 적정 가치를 유지하고 있습니다."
-                fund_sc = 1
+                fund_txt, fund_sc = f"PER {per:.1f}배로 적정 가치를 유지하고 있습니다.", 1
 
         total_sc = tech_sc + fund_sc
         UP_COLOR, DOWN_COLOR, NEUTRAL_COLOR = '#F04452', '#3182F6', '#8B95A1'
         
-        if total_sc >= 3: c_bg, c_txt, msg, action = "rgba(240,68,82,0.12)", UP_COLOR, "🔥 강력 매수 (저평가+차트호전)", "재무적 가치와 차트 타이밍이 완벽하게 일치합니다. 비중을 실어 진입하기 좋은 최적의 타점입니다."
-        elif total_sc > 0: c_bg, c_txt, msg, action = "rgba(240,68,82,0.05)", UP_COLOR, "📈 매수 우위", "하방 경직성이 확보되었습니다. 무리하지 않는 선에서 기계적인 분할 매수 접근이 유효합니다."
-        elif total_sc == 0: c_bg, c_txt, msg, action = "rgba(139,149,161,0.1)", NEUTRAL_COLOR, "⚖️ 중립 관망", "재무와 차트의 신호가 엇갈리거나 모멘텀이 부족합니다. 확실한 방향성이 나올 때까지 대기하세요."
-        else: c_bg, c_txt, msg, action = "rgba(49,130,246,0.12)", DOWN_COLOR, "❄️ 매도 및 리스크 관리", "차트가 꺾인 상태이며 밸류에이션 부담도 있습니다. 수익 중이라면 차익 실현을, 손실 중이라면 비중 축소를 권장합니다."
+        if total_sc >= 3: c_bg, c_txt, msg, action = "rgba(240,68,82,0.12)", UP_COLOR, "🔥 강력 매수", "재무적 가치와 차트 타이밍이 완벽하게 일치합니다."
+        elif total_sc > 0: c_bg, c_txt, msg, action = "rgba(240,68,82,0.05)", UP_COLOR, "📈 매수 우위", "하방 경직성이 확보되었습니다. 기계적인 분할 매수 접근이 유효합니다."
+        elif total_sc == 0: c_bg, c_txt, msg, action = "rgba(139,149,161,0.1)", NEUTRAL_COLOR, "⚖️ 중립 관망", "확실한 방향성이 나올 때까지 대기하세요."
+        else: c_bg, c_txt, msg, action = "rgba(49,130,246,0.12)", DOWN_COLOR, "❄️ 리스크 관리", "수익 중이라면 차익 실현을, 손실 중이라면 비중 축소를 권장합니다."
 
         last = float(c.iloc[-1])
         chg = last - float(c.iloc[-2]) if len(df) > 1 else 0
         chg_pct = (chg/float(c.iloc[-2])) * 100 if chg != 0 else 0
         price_color = UP_COLOR if chg > 0 else DOWN_COLOR if chg < 0 else NEUTRAL_COLOR
         sign = "+" if chg > 0 else ""
-        price_format = f"{last:,.4f}" if last < 10 else f"{last:,.0f}" if asset_type == "주식" else f"{last:,.2f}"
+        
+        # 💵 미국 주식 완벽 포맷팅 (달러 기호 적용)
+        is_us_stock = (asset_type == "주식") and not (ticker.endswith(".KS") or ticker.endswith(".KQ"))
+        curr_sym = "$" if is_us_stock else "₩" if asset_type == "주식" else "$"
+        
+        # 한국 주식은 정수, 미국 주식/코인은 소수점 2자리
+        if is_us_stock or asset_type != "주식":
+            price_format = f"{curr_sym}{last:,.2f}"
+            chg_format = f"{curr_sym}{chg:,.2f}"
+        else:
+            price_format = f"{curr_sym}{last:,.0f}"
+            chg_format = f"{curr_sym}{chg:,.0f}"
 
-        # 렌더링
+        # 상단 렌더링
         st.markdown(f"""
             <div class="mts-header">
                 <div class="mts-ticker">{user_input.split('(')[0]} <span style="font-size:0.8rem; font-weight:normal; color:#6B7684;">({y_int})</span></div>
                 <div class="mts-price-row">
                     <span class="mts-main-price" style="color: {price_color};">{price_format}</span>
-                    <span class="mts-sub-change" style="color: {price_color};">{sign}{chg:,.0f} ({sign}{chg_pct:.2f}%)</span>
+                    <span style="font-size: 1.1rem; font-weight: 700; margin-left: 10px; margin-bottom:5px; color: {price_color};">{sign}{chg_format} ({sign}{chg_pct:.2f}%)</span>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -318,77 +323,84 @@ else:
                 <span class="pattern-badge" style="background-color: {c_bg}; color: {c_txt}; border: 1px solid {c_txt};">{msg}</span>
                 <div style="color: #E5E8EB; font-size: 0.9rem; line-height:1.5; margin-bottom:5px;">📊 <b>차트 판정:</b> {pattern_txt}</div>
                 <div style="color: #E5E8EB; font-size: 0.9rem; line-height:1.5; margin-bottom:8px;">🏢 <b>재무 판정:</b> {fund_txt}</div>
-                <div style="color: #FFF; font-size: 0.95rem; line-height:1.5;">🎯 <b>AI 최종 대응방안:</b> {action}</div>
+                <div style="color: #FFF; font-size: 0.95rem; line-height:1.5;">🎯 <b>AI 대응방안:</b> {action}</div>
             </div>
         """, unsafe_allow_html=True)
 
-        # --- 🚨 [핵심 수정] 보조지표 레이아웃 및 거래량 Y축 마이너스 현상 완벽 수정 ---
+        # --- 🚨 [핵심 수정] 극한의 여백 압축 및 지표 현재값 태그 달기 ---
         rows = 2; row_h = [0.75, 0.25]
-        if show_macd and show_rsi: rows = 4; row_h = [0.55, 0.15, 0.15, 0.15]
+        if show_macd and show_rsi: rows = 4; row_h = [0.6, 0.15, 0.15, 0.1]
         elif show_macd or show_rsi: rows = 3; row_h = [0.6, 0.2, 0.2]
         
-        fig = make_subplots(rows=rows, cols=1, shared_xaxes=True, vertical_spacing=0.02, row_heights=row_h)
+        fig = make_subplots(rows=rows, cols=1, shared_xaxes=True, vertical_spacing=0.015, row_heights=row_h) # 간격 최소화
         
-        # 1. 캔들 차트 및 겹치는 지표들 (Row 1)
+        # 1. 캔들 차트
         fig.add_trace(go.Candlestick(x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=c, 
                                      increasing_line_color=UP_COLOR, increasing_fillcolor=UP_COLOR, 
                                      decreasing_line_color=DOWN_COLOR, decreasing_fillcolor=DOWN_COLOR), row=1, col=1)
         
         if show_ichi and pd.notna(df['Senkou_A'].iloc[-1]):
             fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_A'], line=dict(color='rgba(0,0,0,0)'), showlegend=False, hoverinfo='skip'), row=1, col=1)
-            fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_B'], fill='tonexty', fillcolor='rgba(0,250,154,0.15)', line=dict(color='rgba(0,0,0,0)'), name="구름대"), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['Senkou_B'], fill='tonexty', fillcolor='rgba(0,250,154,0.12)', line=dict(color='rgba(0,0,0,0)')), row=1, col=1)
             
         if show_bb:
-            fig.add_trace(go.Scatter(x=df.index, y=df['BB_up'], line=dict(color='#4E5968', width=1.2, dash='dash')), row=1, col=1)
-            fig.add_trace(go.Scatter(x=df.index, y=df['BB_low'], line=dict(color='#4E5968', width=1.2, dash='dash'), fill='tonexty', fillcolor='rgba(255,255,255,0.02)'), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['BB_up'], line=dict(color='#555', width=1, dash='dash')), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['BB_low'], line=dict(color='#555', width=1, dash='dash'), fill='tonexty', fillcolor='rgba(255,255,255,0.02)'), row=1, col=1)
         if show_ma:
-            fig.add_trace(go.Scatter(x=df.index, y=df['EMA5'], line=dict(color='#FFD400', width=1.8)), row=1, col=1)
-            fig.add_trace(go.Scatter(x=df.index, y=df['EMA20'], line=dict(color='#00F5A0', width=2.2)), row=1, col=1)
-            fig.add_trace(go.Scatter(x=df.index, y=df['EMA60'], line=dict(color='#CC66FF', width=2.0)), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['EMA5'], line=dict(color='#FFD400', width=1.5)), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['EMA20'], line=dict(color='#00F5A0', width=2.0)), row=1, col=1)
+            fig.add_trace(go.Scatter(x=df.index, y=df['EMA60'], line=dict(color='#CC66FF', width=1.8)), row=1, col=1)
         if show_sig:
             fig.add_trace(go.Scatter(x=df[df['Buy']].index, y=df[df['Buy']]['Low']*0.98, mode='markers', marker=dict(symbol='triangle-up', size=13, color='#FF0033')), row=1, col=1)
             fig.add_trace(go.Scatter(x=df[df['Sell']].index, y=df[df['Sell']]['High']*1.02, mode='markers', marker=dict(symbol='triangle-down', size=13, color='#0066FF')), row=1, col=1)
             
-        # 2. 거래량 차트 (Row 2) - 마이너스 공간 제거(rangemode='tozero') 적용
+        # 2. 거래량
         fig.add_trace(go.Bar(x=df.index, y=df['Volume'], marker_color=[UP_COLOR if r['Close']>=r['Open'] else DOWN_COLOR for _, r in df.iterrows()]), row=2, col=1)
-        fig.update_yaxes(rangemode='tozero', showgrid=False, row=2, col=1) # 거래량 축이 무조건 0부터 시작하도록 강제 고정!
+        fig.update_yaxes(rangemode='tozero', showgrid=False, ticklabelposition="inside", row=2, col=1)
         
-        # 3. 보조 지표들 (Row 3, 4)
+        # 3. 보조 지표들 및 현재 값 표시(Annotation)
         curr = 3
         if show_macd:
             fig.add_trace(go.Scatter(x=df.index, y=df['MACD'], line=dict(color='#A78BFA', width=1.5)), row=curr, col=1)
             fig.add_trace(go.Scatter(x=df.index, y=df['Signal'], line=dict(color='#FCD34D', width=1.5)), row=curr, col=1)
             fig.add_trace(go.Bar(x=df.index, y=df['MACD_H'], marker_color=np.where(df['MACD_H']>0, UP_COLOR, DOWN_COLOR)), row=curr, col=1)
+            # MACD 현재값 태그
+            fig.add_annotation(x=df.index[-1], y=df['MACD'].iloc[-1], text=f" {df['MACD'].iloc[-1]:.2f}", showarrow=False, xanchor='left', font=dict(color='#A78BFA', size=11, weight='bold'), row=curr, col=1)
             curr += 1
+            
         if show_rsi:
             fig.add_trace(go.Scatter(x=df.index, y=df['RSI'], line=dict(color='#FF66B2', width=1.8)), row=curr, col=1)
             fig.add_hline(y=70, line_color="#3182F6", line_dash="solid", row=curr, col=1)
             fig.add_hline(y=30, line_color="#F04452", line_dash="solid", row=curr, col=1)
+            # RSI 현재값 태그
+            fig.add_annotation(x=df.index[-1], y=df['RSI'].iloc[-1], text=f" {df['RSI'].iloc[-1]:.1f}", showarrow=False, xanchor='left', font=dict(color='#FF66B2', size=11, weight='bold'), row=curr, col=1)
 
         # X축 날짜 갭 제거
         if y_int in ['1d','1wk']: fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
         elif y_int in ['1m','5m','15m','1h'] and asset_type == "주식": fig.update_xaxes(rangebreaks=[dict(bounds=[16, 9.5], pattern="hour"), dict(bounds=["sat", "mon"])])
 
-        # 레이아웃 최종 세팅 (터치감 유지 및 차트 높이 자동 조절)
+        # 🚨 [터치/줌 마스터 레이아웃] Y축을 안으로 넣어 여백을 극단적으로 줄임
         chart_height = 650 if rows == 4 else 580 if rows == 3 else 480
         fig.update_layout(
-            height=chart_height, template="plotly_dark", dragmode='pan', hovermode='x unified', showlegend=False, xaxis_rangeslider_visible=False, 
-            margin=dict(l=0, r=40, t=5, b=0), plot_bgcolor='#0F1218', paper_bgcolor='#0F1218'
+            height=chart_height, template="plotly_dark", 
+            dragmode='pan', hovermode='x unified', showlegend=False, xaxis_rangeslider_visible=False, 
+            margin=dict(l=0, r=0, t=5, b=0), # 좌우 여백 완전히 0으로 소멸!
+            plot_bgcolor='#000000', paper_bgcolor='#000000' # OLED 블랙
         )
-        fig.update_yaxes(side="right", showgrid=True, gridcolor='#1E2532', zeroline=False, fixedrange=False, tickfont=dict(size=10, color='#8B95A1'))
-        fig.update_xaxes(showgrid=True, gridcolor='#1E2532', zeroline=False, fixedrange=False, tickfont=dict(size=10, color='#8B95A1'))
         
-        st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True, 'displayModeBar': False, 'doubleClick': 'reset'})
+        # ticklabelposition="inside" : Y축 가격표를 차트 안쪽으로 집어넣어 공간 절약
+        fig.update_yaxes(side="right", ticklabelposition="inside", showgrid=True, gridcolor='#111', zeroline=False, fixedrange=False, tickfont=dict(size=11, color='#8B95A1'))
+        fig.update_xaxes(showgrid=True, gridcolor='#111', zeroline=False, fixedrange=False, tickfont=dict(size=11, color='#8B95A1'))
+        
+        # 모바일 핀치 줌 완벽 지원 세팅
+        st.plotly_chart(fig, use_container_width=True, config={'scrollZoom': True, 'displayModeBar': False, 'doubleClick': 'reset', 'responsive': True})
 
-        # 📰 경제지 뉴스 브리핑
-        st.markdown("<h4 style='color:#FFFFFF; margin-top:20px; font-weight:700;'>📰 프리미엄 경제지 뉴스</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:#FFFFFF; margin-top:20px; font-weight:700; margin-left:5px;'>📰 프리미엄 경제지 뉴스</h4>", unsafe_allow_html=True)
         news_items = get_premium_news(user_input.split('(')[0])
         if news_items:
             st.markdown('<div class="news-box">', unsafe_allow_html=True)
             for title, link in news_items:
                 st.markdown(f'<div class="news-item">🔹 <a href="{link}" target="_blank">{title}</a></div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.info("현재 메이저 경제지에서 보도된 최신 뉴스가 없습니다.")
 
     else: st.error("종목 코드를 읽어올 수 없습니다.")
