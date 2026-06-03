@@ -48,7 +48,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ Pro Trader (V13.1 - 줌/확대 기능 해제)")
+st.title("⚡ Pro Trader (V13.2 - 리얼 MTS 터치)")
 
 if 'memos' not in st.session_state: st.session_state['memos'] = []
 
@@ -205,29 +205,29 @@ if not df.empty:
     elif y_int in ['1d','1wk']: fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
     elif y_int in ['1m','5m','15m','1h']: fig.update_xaxes(rangebreaks=[dict(bounds=[16, 9.5], pattern="hour"), dict(bounds=["sat", "mon"])])
 
-    # 🚨 [수정됨] 드래그 모드를 'zoom'으로 변경하고 상단 여백을 늘려 메뉴바 공간 확보
+    # 🚨 [스마트폰 완벽 터치 세팅]
     fig.update_layout(
         height=650, 
         template="plotly_dark", 
-        dragmode='zoom', # 돋보기(가로 확대) 모드 활성화!
+        dragmode='pan', # 👈 1손가락 터치 시 '무조건' 좌우 이동 (MTS 기본)
         hovermode='x unified', 
         showlegend=False, 
         xaxis_rangeslider_visible=False, 
-        margin=dict(l=5, r=40, t=30, b=10), # 상단 여백(t) 확보
+        margin=dict(l=5, r=45, t=10, b=10), 
         plot_bgcolor='#0F1218', 
         paper_bgcolor='#0F1218'
     )
     
+    # 상하좌우 스와이프 모두 허용 설정
     fig.update_yaxes(side="right", showgrid=True, gridcolor='#1E2532', zeroline=False, fixedrange=False)
-    fig.update_xaxes(showgrid=True, gridcolor='#1E2532', zeroline=False)
+    fig.update_xaxes(showgrid=True, gridcolor='#1E2532', zeroline=False, fixedrange=False)
     
-    # 🚨 [수정됨] 차트 우측 상단에 확대/이동/초기화 메뉴바 다시 표시
+    # 🚨 [제스처 및 핀치 줌 적용]
     st.plotly_chart(fig, use_container_width=True, config={
-        'scrollZoom': True, # 마우스 휠 및 두 손가락 핀치 줌 허용
-        'displayModeBar': True, # 상단 메뉴바 부활
-        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d'], # 안 쓰는 잡다한 버튼만 숨김
-        'displaylogo': False,
-        'doubleClick': 'reset' # 화면 두 번 터치하면 원래 크기로 복귀
+        'scrollZoom': True,      # 👈 2손가락으로 꼬집고 펼치면 확대/축소 (핀치 줌 완벽 지원)
+        'displayModeBar': False, # 👈 모바일 화면을 가리고 불편하게 만들던 상단 메뉴바 완전히 삭제!
+        'doubleClick': 'reset',  # 👈 화면을 '따닥' 두 번 터치하면 원래 차트 배율로 싹 돌아옴
+        'displaylogo': False
     })
 else: st.error("데이터 오류. 장이 닫혀있거나 종목명을 다시 확인해 주세요.")
 
